@@ -4,8 +4,9 @@ import org.bytedeco.javacpp.Skia._
 
 class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
   def setAntiAlias(b: Boolean): Paint = { sk_paint_set_antialias(p, b); this }
-  def setTextAlign(align: Paint.TextAlign.TextAlign): Paint = { sk_paint_set_text_align(p, align.id); this }
   def setSubpixelText(b: Boolean): Paint = { sk_paint_set_subpixel_text(p, b); this }
+  def setTextAlign(align: Paint.TextAlign.TextAlign): Paint = { sk_paint_set_text_align(p, align.id); this }
+  def setTextSize(size: Float): Paint = { sk_paint_set_textsize(p, size); this }
   def setColor(color: Int): Paint = { sk_paint_set_color(p, color); this }
   def setStyle(style: Paint.Style.Style): Paint = { sk_paint_set_style(p, style.id); this }
   def setStrokeWidth(width: Float): Paint = { sk_paint_set_stroke_width(p, width); this }
