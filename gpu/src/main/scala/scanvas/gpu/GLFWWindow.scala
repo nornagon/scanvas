@@ -20,6 +20,8 @@ object GLFWWindow {
 class GLFWWindow(val width: Int, val height: Int, title: String) {
   GLFWWindow // reference the object to trigger initialization code
 
+  def this(width: Int, height: Int) = this(width, height, "scanvas")
+
   private val handle = glfwCreateWindow(width, height, title, NULL, NULL)
   private var grContext: Context = _
   private var renderSurface: Surface = _
