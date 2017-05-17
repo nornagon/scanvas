@@ -114,6 +114,7 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
   }
 
   def swapBuffers(): Unit = {
+    canvas.flush()
     glfwSwapBuffers(handle)
     glfwPollEvents()
   }
