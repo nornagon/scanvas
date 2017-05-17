@@ -18,7 +18,7 @@ class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
 }
 
 object Paint {
-  def blank: Paint = new Paint(sk_paint_new())
+  def blank: Paint = new Paint(sk_paint_new()).setAntiAlias(true)
 
   object TextAlign extends Enumeration {
     type TextAlign = Value
