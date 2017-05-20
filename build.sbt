@@ -14,8 +14,8 @@ lazy val core = (project in file("core"))
     name := "scanvas-core",
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "3.0.1" % Test,
-      "org.bytedeco.javacpp-presets" % "skia" % "20170514-53d6729-1.3.3-SNAPSHOT",
-      "org.bytedeco.javacpp-presets" % "skia" % "20170514-53d6729-1.3.3-SNAPSHOT" classifier "macosx-x86_64"
+      "org.bytedeco.javacpp-presets" % "skia" % "20170511-53d6729-1.3.3-SNAPSHOT",
+      "org.bytedeco.javacpp-presets" % "skia" % "20170511-53d6729-1.3.3-SNAPSHOT" classifier "macosx-x86_64"
     )
   )
 
