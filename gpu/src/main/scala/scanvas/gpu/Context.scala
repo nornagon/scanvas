@@ -8,7 +8,8 @@ import scanvas.Surface
 
 class Context private[scanvas] (grContext: gr_context_t) {
   /** Make a GPU-backed surface which renders into the given FBO. */
-  def makeSurfaceForFramebuffer(fbo: Int, width: Int, height: Int): Surface = {
+  // TODO: I don't think passing windowWidth/width is quite right here? research how best to handle physical vs logical px
+  def makeSurfaceForFramebuffer(fbo: Int, windowWidth: Int, windowHeight: Int, width: Int, height: Int): Surface = {
     val prevFBO = glGetInteger(GL_FRAMEBUFFER_BINDING)
     val samples = new Array[Int](1)
     val stencilBits = new Array[Int](1)
@@ -28,7 +29,12 @@ class Context private[scanvas] (grContext: gr_context_t) {
       .fStencilBits(stencilBits(0))
       .fRenderTargetHandle(fbo)
 
-    new Surface(sk_surface_new_backend_render_target(grContext, rtDesc, null))
+    // dummy, just to handle inability to sk_canvas_get_imageinfo()
+    val info = new sk_imageinfo_t()
+      .width(windowWidth)
+      .height(windowHeight)
+
+    new Surface(sk_surface_new_backend_render_target(grContext, rtDesc, null), info)
   }
 
   /** Make a new GPU-backed offscreen surface. */
@@ -38,7 +44,7 @@ class Context private[scanvas] (grContext: gr_context_t) {
       .height(height)
       .colorType(sk_colortype_get_default_8888())
       .alphaType(PREMUL_SK_ALPHATYPE)
-    new Surface(sk_surface_new_render_target(grContext, false, info, 0, null))
+    new Surface(sk_surface_new_render_target(grContext, false, info, 0, null), info)
   }
 }
 

@@ -3,7 +3,7 @@ package scanvas
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.Skia._
 
-class Canvas private[scanvas] (c: sk_canvas_t) {
+class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
   private val rectTmp = new sk_rect_t()
   private val matTmp = new sk_matrix_t()
 
@@ -62,6 +62,10 @@ class Canvas private[scanvas] (c: sk_canvas_t) {
 
   def drawPath(path: Path, paint: Paint): Unit =
     sk_canvas_draw_path(c, path.path, paint.p)
+
+  // TODO: bind SkCanvas::imageInfo
+  def width: Int = info.width()
+  def height: Int = info.height()
 }
 
 object Canvas {

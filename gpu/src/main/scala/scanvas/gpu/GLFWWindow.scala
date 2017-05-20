@@ -22,6 +22,8 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
 
   def this(width: Int, height: Int) = this(width, height, "scanvas")
 
+  // todo: set title
+
   private val handle = glfwCreateWindow(width, height, title, NULL, NULL)
   private var grContext: Context = _
   private var renderSurface: Surface = _
@@ -51,14 +53,14 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
     GL.createCapabilities(/* forwardCompatible = */true)
     glfwSwapInterval(1)
     val (fbWidth, fbHeight) = framebufferSize
-    glViewport(0, 0, fbWidth, fbHeight)
+    //glViewport(0, 0, width, height)
     glClearColor(1, 1, 1, 1)
     glClearStencil(0)
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)
 
     grContext = Context.openGlBackendForCurrentContext
     renderSurface = grContext.makeSurfaceForFramebuffer(
-      glGetInteger(GL_FRAMEBUFFER_BINDING), fbWidth, fbHeight)
+      glGetInteger(GL_FRAMEBUFFER_BINDING), width, height, fbWidth, fbHeight)
     // To handle high-dpi displays
     renderSurface.canvas.scale(fbWidth.toFloat / width, fbHeight.toFloat / height)
 

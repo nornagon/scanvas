@@ -1,5 +1,8 @@
 package scanvas
 
+import java.nio.ByteBuffer
+
+import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.Skia._
 
 class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
@@ -14,10 +17,20 @@ class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
   def setTypeface(tf: Typeface): Paint = { sk_paint_set_typeface(p, tf.tf); this }
   def setMaskFilter(mf: MaskFilter): Paint = { sk_paint_set_maskfilter(p, mf.mf); this }
 
+  def getTextBounds(text: String): Unit = {
+    val textBytes = new Pointer(ByteBuffer.wrap(text.getBytes))
+    sk_paint_measure_text(p, textBytes, text.getBytes.length, Paint.tmpRect)
+  }
+  def getFontMetrics(): Float = {
+    sk_paint_get_fontmetrics(p, Paint.tmpFontMetrics, 0)
+  }
+
   override def clone(): Paint = new Paint(sk_paint_clone(p))
 }
 
 object Paint {
+  private val tmpRect = new sk_rect_t()
+  private val tmpFontMetrics = new sk_fontmetrics_t()
   def blank: Paint = new Paint(sk_paint_new()).setAntiAlias(true)
 
   object TextAlign extends Enumeration {

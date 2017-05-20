@@ -2,8 +2,8 @@ package scanvas
 
 import org.bytedeco.javacpp.Skia._
 
-class Surface private[scanvas] (surface: sk_surface_t) {
-  val canvas = new Canvas(sk_surface_get_canvas(surface))
+class Surface private[scanvas] (surface: sk_surface_t, info: sk_imageinfo_t) {
+  val canvas = new Canvas(sk_surface_get_canvas(surface), info)
 }
 
 object Surface {
@@ -13,6 +13,6 @@ object Surface {
     info.height(height)
     info.colorType(sk_colortype_get_default_8888())
     info.alphaType(PREMUL_SK_ALPHATYPE)
-    new Surface(sk_surface_new_raster(info, null))
+    new Surface(sk_surface_new_raster(info, null), info)
   }
 }
