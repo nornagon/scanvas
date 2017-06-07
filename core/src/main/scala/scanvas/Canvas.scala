@@ -31,6 +31,18 @@ class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
     sk_canvas_set_matrix(this.c, matTmp)
   }
   def concat(mat: sk_matrix_t): Unit = sk_canvas_concat(c, mat)
+  def concat(a: Float, b: Float, c: Float, d: Float, e: Float, f: Float): Unit = {
+    matTmp.mat(0, a)
+    matTmp.mat(1, b)
+    matTmp.mat(2, c)
+    matTmp.mat(3, d)
+    matTmp.mat(4, e)
+    matTmp.mat(5, f)
+    matTmp.mat(6, 0)
+    matTmp.mat(7, 0)
+    matTmp.mat(8, 1)
+    sk_canvas_concat(this.c, matTmp)
+  }
 
   def clear(color: Int): Unit = sk_canvas_clear(c, color)
   def paint(paint: Paint): Unit = sk_canvas_draw_paint(c, paint.p)
