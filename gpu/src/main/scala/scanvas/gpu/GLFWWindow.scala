@@ -24,17 +24,18 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
 
   // todo: set title
 
-  private val handle = glfwCreateWindow(width, height, title, NULL, NULL)
+  val handle: Long = glfwCreateWindow(width, height, title, NULL, NULL)
   private var grContext: Context = _
   private var renderSurface: Surface = _
   private var mouseX: Double = 0
   private var mouseY: Double = 0
+  def context: Context = grContext
 
-  var onMouseMove: (Double, Double) => Unit = _
-  var onMouseDown: (Double, Double, Int) => Unit = _
-  var onMouseUp: (Double, Double, Int) => Unit = _
-  var onKeyDown: (Int, Int, Int) => Unit = _
-  var onKeyUp: (Int, Int, Int) => Unit = _
+  var onMouseMove: (Double, Double) => Unit = _ // (x: Double, y: Double)
+  var onMouseDown: (Double, Double, Int) => Unit = _ // (x: Double, y: Double, button: Int)
+  var onMouseUp: (Double, Double, Int) => Unit = _ // (x: Double, y: Double, button: Int)
+  var onKeyDown: (Int, Int, Int) => Unit = _ // (key: Int, scancode: Int, mods: Int)
+  var onKeyUp: (Int, Int, Int) => Unit = _ // (key: Int, scancode: Int, mods: Int)
   var onCharacter: (Int) => Unit = _
   var onClose: () => Unit = _
 

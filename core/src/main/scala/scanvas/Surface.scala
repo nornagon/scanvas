@@ -13,6 +13,8 @@ object Surface {
     info.height(height)
     info.colorType(sk_colortype_get_default_8888())
     info.alphaType(PREMUL_SK_ALPHATYPE)
-    new Surface(sk_surface_new_raster(info, null), info)
+    new Surface(new sk_surface_t(sk_surface_new_raster(info, null)) {
+      deallocator(() => sk_surface_unref(this))
+    }, info)
   }
 }

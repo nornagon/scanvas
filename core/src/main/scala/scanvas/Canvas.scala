@@ -5,10 +5,14 @@ import org.bytedeco.javacpp.Skia._
 
 class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
   private val rectTmp = new sk_rect_t()
+  private val rectTmpB = new sk_rect_t()
   private val matTmp = new sk_matrix_t()
 
   def save(): Unit = sk_canvas_save(c)
   def restore(): Unit = sk_canvas_restore(c)
+  def saveLayer(x: Float, y: Float, w: Float, h: Float, paint: Paint): Unit = {
+    sk_canvas_save_layer(c, rectTmp.left(x).top(y).right(x + w).bottom(y + h), paint.p)
+  }
 
   def flush(): Unit = sk_canvas_flush(c)
 
@@ -74,6 +78,16 @@ class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
 
   def drawPath(path: Path, paint: Paint): Unit =
     sk_canvas_draw_path(c, path.path, paint.p)
+
+  def drawImage(img: Image, x: Float, y: Float, paint: Paint): Unit =
+    sk_canvas_draw_image(c, img.img, x, y, paint.p)
+  def drawImage(img: Image, x: Float, y: Float): Unit =
+    sk_canvas_draw_image(c, img.img, x, y, null)
+  def drawImageRect(img: Image, srcX: Float, srcY: Float, srcW: Float, srcH: Float, dstX: Float, dstY: Float, dstW: Float, dstH: Float): Unit = {
+    rectTmp.left(srcX).top(srcY).right(srcX + srcW).bottom(srcY + srcH)
+    rectTmpB.left(dstX).top(dstY).right(dstX + dstW).bottom(dstY + dstH)
+    sk_canvas_draw_image_rect(c, img.img, rectTmp, rectTmpB, null)
+  }
 
   // TODO: bind SkCanvas::imageInfo
   def width: Int = info.width()
