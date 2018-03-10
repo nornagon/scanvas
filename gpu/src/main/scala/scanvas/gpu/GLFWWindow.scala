@@ -69,8 +69,8 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
     val bufX = BufferUtils.createDoubleBuffer(1)
     val bufY = BufferUtils.createDoubleBuffer(1)
     glfwGetCursorPos(handle, bufX, bufY)
-    mouseX = bufX.get(0)
-    mouseY = bufY.get(0)
+    mouseX = bufX.get
+    mouseY = bufY.get
     glfwSetCursorPosCallback(handle, (_: Long, x: Double, y: Double) => {
       mouseX = x
       mouseY = y
@@ -127,4 +127,11 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
 
   def shouldClose: Boolean = glfwWindowShouldClose(handle)
   def canvas: Canvas = renderSurface.canvas
+
+  def getCursorPos: (Double, Double) = {
+    val bufX = BufferUtils.createDoubleBuffer(1)
+    val bufY = BufferUtils.createDoubleBuffer(1)
+    glfwGetCursorPos(handle, bufX, bufY)
+    (bufX.get, bufY.get)
+  }
 }
