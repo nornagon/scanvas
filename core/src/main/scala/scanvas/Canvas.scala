@@ -2,6 +2,7 @@ package scanvas
 
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.Skia._
+import scanvas.Canvas.ClipOp
 
 class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
   private val rectTmp = new sk_rect_t()
@@ -46,6 +47,14 @@ class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
     matTmp.mat(7, 0)
     matTmp.mat(8, 1)
     sk_canvas_concat(this.c, matTmp)
+  }
+  def clipRect(x: Float, y: Float, w: Float, h: Float, clipOp: ClipOp.ClipOp = ClipOp.Intersect, doAA: Boolean = false): Unit = {
+    sk_canvas_clip_rect_with_operation(
+      c,
+      rectTmp.left(x).top(y).right(x + w).bottom(y + h),
+      clipOp.id,
+      doAA
+    )
   }
 
   def clear(color: Int): Unit = sk_canvas_clear(c, color)
@@ -100,5 +109,11 @@ object Canvas {
     val Points = Value(POINTS_SK_POINT_MODE)
     val Lines = Value(LINES_SK_POINT_MODE)
     val Polygon = Value(POLYGON_SK_POINT_MODE)
+  }
+
+  object ClipOp extends Enumeration {
+    type ClipOp = Value
+    val Difference = Value(DIFFERENCE_SK_CLIPOP)
+    val Intersect = Value(INTERSECT_SK_CLIPOP)
   }
 }
