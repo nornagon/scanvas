@@ -35,6 +35,7 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
   var onMouseDown: (Double, Double, Int) => Unit = _ // (x: Double, y: Double, button: Int)
   var onMouseUp: (Double, Double, Int) => Unit = _ // (x: Double, y: Double, button: Int)
   var onKeyDown: (Int, Int, Int) => Unit = _ // (key: Int, scancode: Int, mods: Int)
+  var onKeyRepeat: (Int, Int, Int) => Unit = _ // (key: Int, scancode: Int, mods: Int)
   var onKeyUp: (Int, Int, Int) => Unit = _ // (key: Int, scancode: Int, mods: Int)
   var onCharacter: (Int) => Unit = _
   var onClose: () => Unit = _
@@ -95,6 +96,8 @@ class GLFWWindow(val width: Int, val height: Int, title: String) {
           if (onKeyUp != null)
             onKeyUp(key, scancode, mods)
         case GLFW_REPEAT =>
+          if (onKeyRepeat != null)
+            onKeyRepeat(key, scancode, mods)
       }
     })
     glfwSetCharCallback(handle, (_, codepoint: Int) => {
