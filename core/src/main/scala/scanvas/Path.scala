@@ -14,6 +14,8 @@ class Path private[scanvas] (private[scanvas] val path: sk_path_t) {
   def cubicTo(x0: Float, y0: Float, x1: Float, y1: Float, x2: Float, y2: Float): Path =
     { sk_path_cubic_to(path, x0, y0, x1, y1, x2, y2); this }
   def close(): Path = { sk_path_close(path); this }
+  def circle(cx: Float, cy: Float, r: Float, dir: Path.PathDirection.PathDirection = Path.PathDirection.Clockwise): Path =
+    { sk_path_add_circle(path, cx, cy, r, dir.id); this }
 
   def contains(x: Float, y: Float): Boolean = sk_path_contains(path, x, y)
 

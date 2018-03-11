@@ -56,6 +56,8 @@ class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
       doAA
     )
   }
+  def clipPath(path: Path, clipOp: ClipOp.ClipOp = ClipOp.Intersect, doAA: Boolean): Unit =
+    sk_canvas_clip_path_with_operation(c, path.path, clipOp.id, doAA)
 
   def clear(color: Int): Unit = sk_canvas_clear(c, color)
   def paint(paint: Paint): Unit = sk_canvas_draw_paint(c, paint.p)
