@@ -26,7 +26,7 @@ class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
 
   // TODO(jeremy): other functions use top/left/width/height. standardize.
   def getTextBounds(text: String): (Float, Float, Float, Float) = {
-    val textBytes = new Pointer(ByteBuffer.wrap(text.getBytes))
+    val textBytes = new BytePointer(text, "UTF-8")
     sk_paint_measure_text(p, textBytes, text.getBytes.length, Paint.tmpRect)
     (Paint.tmpRect.top(), Paint.tmpRect.left(), Paint.tmpRect.bottom(), Paint.tmpRect.right())
   }
