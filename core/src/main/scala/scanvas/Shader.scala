@@ -39,4 +39,14 @@ object Shader {
     )
     fromImage(image, tileX, tileY, mat)
   }
+
+  def radialGradient(cx: Float, cy: Float, radius: Float, colors: Seq[(Int, Float)], tileMode: TileMode.TileMode): Shader = {
+    val center = new sk_point_t().x(cx).y(cy)
+    val colorsArr = colors.map(_._1).toArray
+    val colorPosArr = colors.map(_._2).toArray
+    val s = new sk_shader_t(sk_shader_new_radial_gradient(center, radius, colorsArr, colorPosArr, colors.size, tileMode.id, null)) {
+      deallocator(() => sk_shader_unref(this))
+    }
+    new Shader(s)
+  }
 }
