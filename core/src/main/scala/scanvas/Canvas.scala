@@ -99,6 +99,11 @@ class Canvas private[scanvas] (c: sk_canvas_t, info: sk_imageinfo_t) {
     rectTmpB.left(dstX).top(dstY).right(dstX + dstW).bottom(dstY + dstH)
     sk_canvas_draw_image_rect(c, img.img, rectTmp, rectTmpB, null)
   }
+  def drawImageRect(img: Image, srcX: Float, srcY: Float, srcW: Float, srcH: Float, dstX: Float, dstY: Float, dstW: Float, dstH: Float, paint: Paint): Unit = {
+    rectTmp.left(srcX).top(srcY).right(srcX + srcW).bottom(srcY + srcH)
+    rectTmpB.left(dstX).top(dstY).right(dstX + dstW).bottom(dstY + dstH)
+    sk_canvas_draw_image_rect(c, img.img, rectTmp, rectTmpB, paint.p)
+  }
 
   def drawBitmap(bitmap: Bitmap, x: Float, y: Float, paint: Paint): Unit =
     sk_canvas_draw_bitmap(c, bitmap.b, x, y, paint.p)
