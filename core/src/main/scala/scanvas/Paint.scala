@@ -1,10 +1,9 @@
 package scanvas
 
-import java.nio.ByteBuffer
 import java.text.BreakIterator
 
+import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Skia._
-import org.bytedeco.javacpp.{BytePointer, Pointer}
 import scanvas.Paint.FontMetrics
 
 import scala.collection.mutable
@@ -20,6 +19,7 @@ class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
   def setStyle(style: Paint.Style.Style): Paint = { sk_paint_set_style(p, style.id); this }
   def setStrokeWidth(width: Float): Paint = { sk_paint_set_stroke_width(p, width); this }
   def setShader(shader: Shader): Paint = { sk_paint_set_shader(p, shader.s); this }
+  def setBlendMode(blendMode: Paint.BlendMode.BlendMode): Paint = { sk_paint_set_blendmode(p, blendMode.id); this }
 
   def setTypeface(tf: Typeface): Paint = { sk_paint_set_typeface(p, tf.tf); this }
   def setMaskFilter(mf: MaskFilter): Paint = { sk_paint_set_maskfilter(p, mf.mf); this }
@@ -157,5 +157,38 @@ object Paint {
     val Fill = Value(FILL_SK_PAINT_STYLE)
     val Stroke = Value(STROKE_SK_PAINT_STYLE)
     val StrokeAndFill = Value(STROKE_AND_FILL_SK_PAINT_STYLE)
+  }
+
+  object BlendMode extends Enumeration {
+    type BlendMode = Value
+    val Clear = Value(CLEAR_SK_BLENDMODE)
+    val Src = Value(SRC_SK_BLENDMODE)
+    val Dst = Value(DST_SK_BLENDMODE)
+    val SrcOver = Value(SRCOVER_SK_BLENDMODE)
+    val DstOver = Value(DSTOVER_SK_BLENDMODE)
+    val SrcIn = Value(SRCIN_SK_BLENDMODE)
+    val DstIn = Value(DSTIN_SK_BLENDMODE)
+    val SrcOut = Value(SRCOUT_SK_BLENDMODE)
+    val DstOut = Value(DSTOUT_SK_BLENDMODE)
+    val SrcAtop = Value(SRCATOP_SK_BLENDMODE)
+    val DstAtop = Value(DSTATOP_SK_BLENDMODE)
+    val Xor = Value(XOR_SK_BLENDMODE)
+    val Plus = Value(PLUS_SK_BLENDMODE)
+    val Modulate = Value(MODULATE_SK_BLENDMODE)
+    val Screen = Value(SCREEN_SK_BLENDMODE)
+    val Overlay = Value(OVERLAY_SK_BLENDMODE)
+    val Darken = Value(DARKEN_SK_BLENDMODE)
+    val Lighten = Value(LIGHTEN_SK_BLENDMODE)
+    val ColorDodge = Value(COLORDODGE_SK_BLENDMODE)
+    val ColorBurn = Value(COLORBURN_SK_BLENDMODE)
+    val HardLight = Value(HARDLIGHT_SK_BLENDMODE)
+    val SoftLight = Value(SOFTLIGHT_SK_BLENDMODE)
+    val Difference = Value(DIFFERENCE_SK_BLENDMODE)
+    val Exclusion = Value(EXCLUSION_SK_BLENDMODE)
+    val Multiply = Value(MULTIPLY_SK_BLENDMODE)
+    val Hue = Value(HUE_SK_BLENDMODE)
+    val Saturation = Value(SATURATION_SK_BLENDMODE)
+    val Color = Value(COLOR_SK_BLENDMODE)
+    val Luminosity = Value(LUMINOSITY_SK_BLENDMODE)
   }
 }
