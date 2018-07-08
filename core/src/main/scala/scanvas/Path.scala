@@ -2,11 +2,8 @@ package scanvas
 
 import org.bytedeco.javacpp.Skia._
 import scanvas.Path._
-import scanvas.Shader.Mat33
 
 class Path private[scanvas] (private[scanvas] val path: sk_path_t) {
-  private val matTmp = new sk_matrix_t()
-
   def moveTo(x: Float, y: Float): Path = { sk_path_move_to(path, x, y); this }
   def lineTo(x: Float, y: Float): Path = { sk_path_line_to(path, x, y); this }
   def quadTo(x0: Float, y0: Float, x1: Float, y1: Float): Path =
@@ -18,10 +15,22 @@ class Path private[scanvas] (private[scanvas] val path: sk_path_t) {
   def close(): Path = { sk_path_close(path); this }
   def circle(cx: Float, cy: Float, r: Float, dir: Path.PathDirection.PathDirection = Path.PathDirection.Clockwise): Path =
     { sk_path_add_circle(path, cx, cy, r, dir.id); this }
+  def rect(x: Float, y: Float, w: Float, h: Float, direction: Path.PathDirection.PathDirection = Path.PathDirection.Clockwise): Path = {
+    Tmp.rect1.left(x).top(y).right(x + w).bottom(y + h)
+    sk_path_add_rect(path, Tmp.rect1, direction.id)
+    this
+  }
+
+  /**
+    * Transform the points in this path by matrix.
+    * <p>
+    * Mutates the path in-place.
+    * @return this
+    */
   def transform(mat: Mat33): Path = {
     val (a, b, c, d, e, f, g, h, i) = mat
-    matTmp.mat().put(a, b, c, d, e, f, g, h, i)
-    sk_path_transform(path, matTmp)
+    Tmp.mat1.mat().put(a, b, c, d, e, f, g, h, i)
+    sk_path_transform(path, Tmp.mat1)
     this
   }
 
@@ -30,31 +39,55 @@ class Path private[scanvas] (private[scanvas] val path: sk_path_t) {
   def setFillType(fillType: Path.FillType.FillType): Path =
     { sk_path_set_filltype(path, fillType.id); this }
 
-  def rect(x: Float, y: Float, w: Float, h: Float, direction: Path.PathDirection.PathDirection = Path.PathDirection.Clockwise): Path = {
-    Path.tmpRect.left(x).top(y).right(x + w).bottom(y + h)
-    sk_path_add_rect(path, Path.tmpRect, direction.id)
-    this
-  }
-
+  /**
+    * Clear any lines and curves from the path, making it empty. This frees up internal storage associated with those
+    * segments.
+    */
   def reset(): Unit = sk_path_reset(path)
 
+  /**
+    * Returns the bounds of the path's points. If the path contains zero points/verbs, this will return the "empty"
+    * rect [0, 0, 0, 0].
+    * <p>
+    * Note: this bounds may be larger than the actual shape, since curves do not extend as far as their control points.
+    * Additionally this bound encompasses all points, even isolated moveTos either preceding or following the last
+    * non-degenerate contour.
+    */
   def bounds: (Float, Float, Float, Float) = {
-    sk_path_get_bounds(path, Path.tmpRect)
-    (Path.tmpRect.left, Path.tmpRect.top, Path.tmpRect.right - Path.tmpRect.left, Path.tmpRect.bottom - Path.tmpRect.top)
+    sk_path_get_bounds(path, Tmp.rect1)
+    (Tmp.rect1.left, Tmp.rect1.top, Tmp.rect1.right - Tmp.rect1.left, Tmp.rect1.bottom - Tmp.rect1.top)
   }
 
+  /**
+    * Computes a bounds that is conservatively "snug" around the path. This assumes that the
+    * path will be filled. It does not attempt to collapse away contours that are logically
+    * empty (e.g. moveTo(x, y) + lineTo(x, y)) but will include them in the calculation.
+    * <p>
+    * It differs from getBounds() in that it will look at the snug bounds of curves, whereas
+    * getBounds() just returns the bounds of the control-points. Thus computing this may be
+    * slower than just calling `bounds`.
+    * <p>
+    * If the path is empty (i.e. no points or verbs), it will return SkRect::MakeEmpty().
+    */
   def tightBounds: (Float, Float, Float, Float) = {
-    sk_path_compute_tight_bounds(path, Path.tmpRect)
-    (Path.tmpRect.left, Path.tmpRect.top, Path.tmpRect.right - Path.tmpRect.left, Path.tmpRect.bottom - Path.tmpRect.top)
+    sk_path_compute_tight_bounds(path, Tmp.rect1)
+    (Tmp.rect1.left, Tmp.rect1.top, Tmp.rect1.right - Tmp.rect1.left, Tmp.rect1.bottom - Tmp.rect1.top)
   }
 
-  def foreach(f: (PathElement) => Unit): Unit = {
-    val iter = sk_path_create_iter(path, 0)
+  /**
+    * Iterate through all of the segments (lines, quadratics, cubics) of each contours in a path.
+    * <p>
+    * The iterator cleans up the segments along the way, removing degenerate segments and adding close verbs where
+    * necessary. When the forceClose argument is provided, each contour (as defined by a new starting move command) will
+    * be completed with a close verb regardless of the contour's contents.
+    */
+  def foreach(f: PathElement => Unit): Unit = {
+    val iter = sk_path_create_iter(path, /* forceClose = */ 0)
     val pointBuf = new sk_point_t(4)
     var verb: Verb.Verb = Verb.Move
     while (verb != Verb.Done) {
       pointBuf.position(0)
-      verb = Verb(sk_path_iter_next(iter, pointBuf, 0, 0))
+      verb = Verb(sk_path_iter_next(iter, pointBuf, /* doConsumeDegenerates = */ 0, /* exact = */ 0))
       verb match {
         case Verb.Done =>
         case Verb.Close =>
@@ -96,7 +129,6 @@ class Path private[scanvas] (private[scanvas] val path: sk_path_t) {
 }
 
 object Path {
-  private[scanvas] val tmpRect = new sk_rect_t()
   def empty: Path = new Path(new sk_path_t(sk_path_new()) {
     deallocator(() => sk_path_delete(this))
   })

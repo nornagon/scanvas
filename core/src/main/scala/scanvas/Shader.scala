@@ -2,7 +2,7 @@ package scanvas
 
 import org.bytedeco.javacpp.Skia._
 
-class Shader private[scanvas] (private[scanvas] val s: sk_shader_t) {
+class Shader private[scanvas](private[scanvas] val s: sk_shader_t) {
 
 }
 
@@ -14,17 +14,10 @@ object Shader {
     val Mirror = Value(MIRROR_SK_SHADER_TILEMODE)
   }
 
-  type Mat33 = (
-    Float, Float, Float,
-    Float, Float, Float,
-    Float, Float, Float
-  )
-
   def fromImage(image: Image, tileX: TileMode.TileMode, tileY: TileMode.TileMode, matrix: Mat33): Shader = {
-    val mat = new sk_matrix_t
     val (a, b, c, d, e, f, g, h, i) = matrix
-    mat.mat().put(a, b, c, d, e, f, g, h, i)
-    val s = new sk_shader_t(sk_image_make_shader(image.img, tileX.id, tileY.id, mat)) {
+    Tmp.mat1.mat().put(a, b, c, d, e, f, g, h, i)
+    val s = new sk_shader_t(sk_image_make_shader(image.img, tileX.id, tileY.id, Tmp.mat1)) {
       deallocator(() => sk_shader_unref(this))
     }
 
@@ -41,7 +34,7 @@ object Shader {
   }
 
   def radialGradient(cx: Float, cy: Float, radius: Float, colors: Seq[(Int, Float)], tileMode: TileMode.TileMode): Shader = {
-    val center = new sk_point_t().x(cx).y(cy)
+    val center = Tmp.point1.x(cx).y(cy)
     val colorsArr = colors.map(_._1).toArray
     val colorPosArr = colors.map(_._2).toArray
     val s = new sk_shader_t(sk_shader_new_radial_gradient(center, radius, colorsArr, colorPosArr, colors.size, tileMode.id, null)) {

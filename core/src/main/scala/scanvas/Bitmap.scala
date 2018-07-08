@@ -10,8 +10,7 @@ class Bitmap private[scanvas] (private[scanvas] val b: sk_bitmap_t, info: sk_ima
 
 object Bitmap {
   def make(w: Int, h: Int): Bitmap = {
-    val info = new sk_imageinfo_t
-    info
+    val info = new sk_imageinfo_t()
       .width(w)
       .height(h)
       .colorType(sk_colortype_get_default_8888())

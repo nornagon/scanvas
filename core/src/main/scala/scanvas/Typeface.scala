@@ -3,9 +3,7 @@ package scanvas
 import org.bytedeco.javacpp.Skia._
 
 class Typeface private[scanvas] (private[scanvas] val tf: sk_typeface_t) {
-  override def finalize(): Unit = {
-    sk_typeface_unref(tf)
-  }
+
 }
 
 object Typeface {

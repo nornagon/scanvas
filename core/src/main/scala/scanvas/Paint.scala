@@ -27,8 +27,8 @@ class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
   // TODO(jeremy): other functions use top/left/width/height. standardize.
   def getTextBounds(text: String): (Float, Float, Float, Float) = {
     val textBytes = new BytePointer(text, "UTF-8")
-    sk_paint_measure_text(p, textBytes, text.getBytes.length, Paint.tmpRect)
-    (Paint.tmpRect.top(), Paint.tmpRect.left(), Paint.tmpRect.bottom(), Paint.tmpRect.right())
+    sk_paint_measure_text(p, textBytes, text.getBytes.length, Tmp.rect1)
+    (Tmp.rect1.top(), Tmp.rect1.left(), Tmp.rect1.bottom(), Tmp.rect1.right())
   }
 
   def breakText(text: String, maxWidth: Float): (Long, Float) = {
@@ -101,7 +101,6 @@ class Paint private[scanvas] (private[scanvas] val p: sk_paint_t) {
 }
 
 object Paint {
-  private val tmpRect = new sk_rect_t()
   private val tmpFontMetrics = new sk_fontmetrics_t()
   def blank: Paint = new Paint(new sk_paint_t(sk_paint_new()) {
     deallocator(() => sk_paint_delete(this))
